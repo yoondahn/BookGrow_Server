@@ -30,6 +30,14 @@ public class UserController {
         return ResponseEntity.ok(userService.register(user));
     }
 
+    // 아이디 중복 확인
+    @GetMapping("/checkId")
+    public ResponseEntity<Boolean> checkDuplicate(@RequestParam String register_id) {
+        log.info("아이디 중복 확인 요청: {}", register_id);
+        boolean isDuplicate = userService.isRegisterIdDuplicate(register_id);
+        return ResponseEntity.ok(isDuplicate);
+    }
+
     // 로그인
     @PostMapping("/login")
     public ResponseEntity<User> login(@RequestParam String userId, @RequestParam String password) {

@@ -37,4 +37,9 @@ public class UserService {
         return userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 ID의 사용자가 존재하지 않습니다."));
     }
+
+    // 아이디 중복 확인 로직
+    public boolean isRegisterIdDuplicate(String registerId) {
+        return userRepository.existsByRegisterId(registerId);
+    }
 }
