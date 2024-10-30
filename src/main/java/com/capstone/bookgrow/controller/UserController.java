@@ -4,8 +4,12 @@ import com.capstone.bookgrow.entity.User;
 import com.capstone.bookgrow.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/bookgrow/user")
@@ -40,9 +44,30 @@ public class UserController {
 
     // 로그인
     @PostMapping("/login")
-    public ResponseEntity<User> login(@RequestParam String userId, @RequestParam String password) {
-        log.info("로그인 요청: {}", userId);
-        return ResponseEntity.ok(userService.login(userId, password));
+    public ResponseEntity<?> login(@RequestParam String registerId, @RequestParam String password) {
+        log.info("로그인 요청: {}", registerId);
+        User user = userService.login(registerId, password);
+
+        if (user != null) {
+            // 필요한 필드만 포함하는 Map 객체 생성
+            Map<String, Object> userData = new HashMap<>();
+            userData.put("id", user.getId());
+            userData.put("registerId", user.getRegisterId());
+            userData.put("password", user.getPassword());
+            userData.put("name", user.getName());
+            userData.put("nickname", user.getNickname());
+
+            // success와 함께 userData를 반환
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("user", userData);
+            return ResponseEntity.ok(response);
+        } else {
+            // 로그인 실패 시 success: false 반환
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
     }
 
     // 회원 조회
