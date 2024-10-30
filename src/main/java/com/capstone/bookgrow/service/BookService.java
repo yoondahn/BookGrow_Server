@@ -19,10 +19,15 @@ public class BookService {
     @Autowired
     private CategoryRepository categoryRepository;
 
-    // 책 등록
-    public Book registerBook(Book book) {
-        Optional<Category> category = categoryRepository.findById(1L); // category_id는 항상 default
+    // 책 등록 (userId 추가)
+    public Book registerBook(Book book, Long userId) {
+        // userId를 직접 설정
+        book.setUserId(userId);
+
+        // 기본 카테고리 설정
+        Optional<Category> category = categoryRepository.findById(1L);
         category.ifPresent(book::setCategory);
+
         return bookRepository.save(book);
     }
 
@@ -33,13 +38,11 @@ public class BookService {
         if (bookOptional.isPresent()) {
             Book book = bookOptional.get();
 
-            // categoryId가 존재할 경우만 수정
             if (categoryId != null) {
                 Optional<Category> categoryOptional = categoryRepository.findById(categoryId);
                 categoryOptional.ifPresent(book::setCategory);
             }
 
-            // isCompleted가 존재할 경우만 수정
             if (isCompleted != null) {
                 book.setIs_completed(isCompleted);
             }
@@ -56,8 +59,8 @@ public class BookService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 ID의 책이 존재하지 않습니다."));
     }
 
-    // 모든 책 조회
-    public List<Book> getAllBooks() {
-        return bookRepository.findAll();
+    // 사용자별 모든 책 조회
+    public List<Book> getAllBooks(Long userId) {
+        return bookRepository.findByUserId(userId);
     }
 }

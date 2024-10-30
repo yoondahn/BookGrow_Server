@@ -18,14 +18,15 @@ public class Book {
     @JoinColumn(name = "category_id")
     private Category category;
 
+    private Long userId;
+
     private String title;
     private String author;
     private String publisher;
     private String published_year;
     private String isbn;
     private String total_page;
-    private String format;
+    private String current_page;
     private String image_url;
-    private String genre;
     private Boolean is_completed;
 }

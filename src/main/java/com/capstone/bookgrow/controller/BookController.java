@@ -17,13 +17,13 @@ public class BookController {
     @Autowired
     private BookService bookService;
 
+
     // 도서 등록
     @PostMapping("/register")
-    public ResponseEntity<Book> registerBook(@RequestBody Book book) {
+    public ResponseEntity<Book> registerBook(@RequestBody Book book, @RequestParam Long userId) {
         log.info("도서 등록 요청: {}, {}", book.getTitle(), book.getAuthor());
-        return ResponseEntity.ok(bookService.registerBook(book));
+        return ResponseEntity.ok(bookService.registerBook(book, userId));
     }
-
     // 도서 수정
     @PutMapping("/update")
     public ResponseEntity<Book> updateBook(@RequestParam Long id,
@@ -40,10 +40,10 @@ public class BookController {
         return ResponseEntity.ok(bookService.getBook(id));
     }
 
-    // 전체 도서 조회
+    // 사용자별 도서 조회
     @GetMapping("/getAll")
-    public ResponseEntity<List<Book>> getAllBooks() {
-        log.info("전체 도서 조회 요청");
-        return ResponseEntity.ok(bookService.getAllBooks());
+    public ResponseEntity<List<Book>> getAllBooks(@RequestParam Long userId) {
+        log.info("사용자별 도서 조회 요청: userId={}", userId);
+        return ResponseEntity.ok(bookService.getAllBooks(userId));
     }
 }
