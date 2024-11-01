@@ -17,6 +17,11 @@ public class User {
     private String name;
     private String nickname;
 
+    // 누적 독서 시간 (시간, 분, 초 단위)
+    private int cumulativeHours;
+    private int cumulativeMinutes;
+    private int cumulativeSeconds;
+
     private String pages_per_day;
     private String time_per_page;
     private int owned;

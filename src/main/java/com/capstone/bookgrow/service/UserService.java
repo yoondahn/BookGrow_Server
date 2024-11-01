@@ -42,4 +42,13 @@ public class UserService {
     public boolean isRegisterIdDuplicate(String registerId) {
         return userRepository.existsByRegisterId(registerId);
     }
+
+    // complete 필드 증가 메서드
+    public void incrementCompleteField(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 ID의 사용자가 존재하지 않습니다."));
+
+        user.setComplete(user.getComplete() + 1); // complete 필드 증가
+        userRepository.save(user);
+    }
 }

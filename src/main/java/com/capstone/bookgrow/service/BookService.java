@@ -2,8 +2,10 @@ package com.capstone.bookgrow.service;
 
 import com.capstone.bookgrow.entity.Book;
 import com.capstone.bookgrow.entity.Category;
+import com.capstone.bookgrow.entity.User;
 import com.capstone.bookgrow.repository.BookRepository;
 import com.capstone.bookgrow.repository.CategoryRepository;
+import com.capstone.bookgrow.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,21 +16,37 @@ import java.util.Optional;
 public class BookService {
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private BookRepository bookRepository;
 
     @Autowired
     private CategoryRepository categoryRepository;
 
-    // 책 등록 (userId 추가)
+    @Autowired
+    private UserService userService;
+
+    // 책 등록
     public Book registerBook(Book book, Long userId) {
-        // userId를 직접 설정
         book.setUserId(userId);
 
         // 기본 카테고리 설정
         Optional<Category> category = categoryRepository.findById(1L);
         category.ifPresent(book::setCategory);
 
-        return bookRepository.save(book);
+        // 책 등록
+        Book savedBook = bookRepository.save(book);
+
+        // 소유 도서 수 증가 로직
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            user.setOwned(user.getOwned() + 1); // owned 필드 +1 증가
+            userRepository.save(user);
+        }
+
+        return savedBook;
     }
 
     // 책 수정
