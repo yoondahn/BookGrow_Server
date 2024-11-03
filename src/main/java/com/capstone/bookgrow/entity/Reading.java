@@ -5,6 +5,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter @Setter
 public class Reading {
@@ -13,12 +16,21 @@ public class Reading {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
-    @JoinColumn(name = "book_id")
+    @JoinColumn(name = "book_id", unique = true)
     private Book book;
 
-    private String review;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    @JoinColumn(name = "user_id")
+    private User user;
+
     private String total_time;
     private int end_page;
+
+    @ElementCollection
+    @CollectionTable(name = "reading_review", joinColumns = @JoinColumn(name = "reading_id"))
+    @Column(name = "review")
+    private List<String> review = new ArrayList<>();
 }
