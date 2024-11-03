@@ -17,9 +17,9 @@ public class ReadingController {
 
     // Reading 추가
     @PostMapping("/add")
-    public ResponseEntity<Reading> addReading(@RequestBody Reading reading, @RequestParam Long bookId) {
-        log.info("Reading 추가 요청: {}, {}", bookId, reading.getReview());
-        return ResponseEntity.ok(readingService.addReading(reading, bookId));
+    public ResponseEntity<Reading> addReading(@RequestBody Reading reading, @RequestParam Long bookId, @RequestParam Long userId) {
+        log.info("Reading 추가 요청: bookId={}, userId={}, review={}", bookId, userId, reading.getReview());
+        return ResponseEntity.ok(readingService.addReading(reading, bookId, userId));
     }
 
     // Book ID로 Reading 조회
