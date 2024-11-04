@@ -33,4 +33,6 @@ public class Reading {
     @CollectionTable(name = "reading_review", joinColumns = @JoinColumn(name = "reading_id"))
     @Column(name = "review")
     private List<String> review = new ArrayList<>();
+
+    private Boolean isCompleted;
 }

@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/bookgrow/book")
@@ -49,9 +50,9 @@ public class BookController {
 
     // 도서 조회
     @GetMapping("/get")
-    public ResponseEntity<Book> getBook(@RequestParam Long id) {
-        log.info("도서 조회 요청: {}", id);
-        return ResponseEntity.ok(bookService.getBook(id));
+    public ResponseEntity<Map<String, Object>> getBook(@RequestParam Long id) {
+        Map<String, Object> bookInfo = bookService.getBook(id);
+        return ResponseEntity.ok(bookInfo);
     }
 
     // 사용자별 도서 조회

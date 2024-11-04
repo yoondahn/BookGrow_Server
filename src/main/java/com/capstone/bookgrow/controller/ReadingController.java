@@ -21,10 +21,10 @@ public class ReadingController {
     // Reading 추가 또는 업데이트
     @PostMapping("/add")
     public ResponseEntity<Reading> addOrUpdateReading(@RequestBody Reading reading, @RequestParam Long bookId,
-                                                      @RequestParam Long userId, @RequestParam Boolean isCompleted) {
+                                                      @RequestParam Long userId) {
         log.info("Reading 추가 또는 업데이트 요청: bookId={}, userId={}, review={}, isCompleted={}",
-                bookId, userId, reading.getReview(), isCompleted);
-        return ResponseEntity.ok(readingService.addOrUpdateReading(reading, bookId, userId, isCompleted));
+                bookId, userId, reading.getReview(), reading.getIsCompleted());
+        return ResponseEntity.ok(readingService.addOrUpdateReading(reading, bookId, userId));
     }
 
     // User ID로 책 정보 조회

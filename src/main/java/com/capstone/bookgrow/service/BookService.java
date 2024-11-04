@@ -5,12 +5,16 @@ import com.capstone.bookgrow.entity.Category;
 import com.capstone.bookgrow.entity.User;
 import com.capstone.bookgrow.repository.BookRepository;
 import com.capstone.bookgrow.repository.CategoryRepository;
+import com.capstone.bookgrow.repository.ReadingRepository;
 import com.capstone.bookgrow.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class BookService {
@@ -20,6 +24,9 @@ public class BookService {
 
     @Autowired
     private BookRepository bookRepository;
+
+    @Autowired
+    private ReadingRepository readingRepository;
 
     @Autowired
     private CategoryRepository categoryRepository;
@@ -72,9 +79,34 @@ public class BookService {
     }
 
     // 책 조회
-    public Book getBook(Long id) {
-        return bookRepository.findById(id)
+    public Map<String, Object> getBook(Long id) {
+        Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 ID의 책이 존재하지 않습니다."));
+
+        // 책의 상세 정보를 맵으로 준비
+        Map<String, Object> bookInfo = new HashMap<>();
+        bookInfo.put("imageUrl", book.getImage_url());
+        bookInfo.put("title", book.getTitle());
+        bookInfo.put("author", book.getAuthor());
+        bookInfo.put("publisher", book.getPublisher());
+        bookInfo.put("publishedDate", book.getPublished_year());
+        bookInfo.put("isbn", book.getIsbn());
+        bookInfo.put("currentPage", book.getCurrent_page());
+        bookInfo.put("totalPage", book.getTotal_page());
+
+        // Reading 엔티티에서 리뷰 리스트 가져오기
+        List<String> reviewList = readingRepository.findAllByBook(book)
+                .stream()
+                .flatMap(reading -> reading.getReview().stream())
+                .collect(Collectors.toList());
+
+        bookInfo.put("review", reviewList);
+
+        // 로그 출력
+        System.out.println("조회한 책 정보: " + bookInfo);
+        System.out.println("리뷰 리스트: " + reviewList);
+
+        return bookInfo;
     }
 
     // 사용자별 모든 책 조회

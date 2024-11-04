@@ -28,7 +28,7 @@ public class ReadingService {
     private UserRepository userRepository;
 
     // Reading 추가 또는 업데이트
-    public Reading addOrUpdateReading(Reading reading, Long bookId, Long userId, Boolean isCompleted) {
+    public Reading addOrUpdateReading(Reading reading, Long bookId, Long userId) {
         Optional<Book> bookOptional = bookRepository.findById(bookId);
         Optional<User> userOptional = userRepository.findById(userId);
 
@@ -36,7 +36,6 @@ public class ReadingService {
             Book book = bookOptional.get();
             User user = userOptional.get();
 
-            // 모든 Reading 엔티티 가져와서 bookId와 userId로 필터링
             List<Reading> allReadings = readingRepository.findAll();
             Reading existingReading = allReadings.stream()
                     .filter(r -> r.getBook().equals(book) && r.getUser().equals(user))
@@ -44,42 +43,42 @@ public class ReadingService {
                     .orElse(null);
 
             if (existingReading != null) {
-                // 기존 리뷰 리스트 로그 출력
-                List<String> currentReviewList = new ArrayList<>(existingReading.getReview()); // 복사본 생성
+                List<String> currentReviewList = new ArrayList<>(existingReading.getReview());
                 List<String> newReviewList = reading.getReview();
 
                 logger.info("기존 리뷰: {}", currentReviewList);
                 logger.info("새로운 리뷰: {}", newReviewList);
 
-                // 기존 리뷰 리스트에 새로운 리뷰 추가
                 currentReviewList.addAll(newReviewList);
-                existingReading.setReview(currentReviewList);  // 명시적으로 전체 리뷰 리스트를 설정
+                existingReading.setReview(currentReviewList);
                 existingReading.setTotal_time(reading.getTotal_time());
                 existingReading.setEnd_page(reading.getEnd_page());
-                reading = existingReading; // 기존 엔티티에 업데이트
+                existingReading.setIsCompleted(reading.getIsCompleted()); // 완료 여부 업데이트
+                reading = existingReading;
 
                 logger.info("업데이트된 리뷰 리스트: {}", existingReading.getReview());
             } else {
-                // 새로운 Reading 엔티티 설정
                 reading.setBook(book);
                 reading.setUser(user);
                 logger.info("새로운 Reading 엔티티 생성 - bookId: {}, userId: {}", bookId, userId);
             }
 
-            // end_page를 current_page로 업데이트
             book.setCurrent_page(String.valueOf(reading.getEnd_page()));
             bookRepository.save(book);
 
-            // Reading 엔티티 저장 또는 업데이트
             Reading savedReading = readingRepository.save(reading);
 
-            // 누적 시간 업데이트
             updateCumulativeTime(user, reading.getTotal_time());
 
-            // 만약 isCompleted가 true이면, complete와 flower 필드를 증가
-            if (isCompleted) {
+            if (Boolean.TRUE.equals(reading.getIsCompleted())) { // 완료 여부가 true이면 업데이트
                 user.setComplete(user.getComplete() + 1);
                 user.setFlower(user.getFlower() + 1);
+
+                // flower가 3의 배수일 경우 domination 증가
+                if (user.getFlower() % 3 == 0) {
+                    user.setDomination(user.getDomination() + 1);
+                }
+
                 userRepository.save(user);
             }
 
@@ -89,7 +88,7 @@ public class ReadingService {
         }
     }
 
-    // userId로 연결된 책 정보를 반환하는 메서드
+    // userId로 연결된 책 정보를 반환하는 메서드 (isCompleted가 false인 경우만 포함)
     public List<Map<String, Object>> getBooksByUserId(Long userId) {
         Optional<User> userOptional = userRepository.findById(userId);
 
@@ -102,14 +101,16 @@ public class ReadingService {
         List<Map<String, Object>> bookInfoList = new ArrayList<>();
 
         for (Reading reading : readings) {
-            Book book = reading.getBook();
-            Map<String, Object> bookInfo = new HashMap<>();
-            bookInfo.put("bookId", book.getId());
-            bookInfo.put("title", book.getTitle());
-            bookInfo.put("image_url", book.getImage_url());
-            bookInfo.put("current_page", book.getCurrent_page());
-            bookInfo.put("total_page", book.getTotal_page());
-            bookInfoList.add(bookInfo);
+            if (Boolean.FALSE.equals(reading.getIsCompleted())) {  // isCompleted가 false인 경우만 반환
+                Book book = reading.getBook();
+                Map<String, Object> bookInfo = new HashMap<>();
+                bookInfo.put("bookId", book.getId());
+                bookInfo.put("title", book.getTitle());
+                bookInfo.put("image_url", book.getImage_url());
+                bookInfo.put("current_page", book.getCurrent_page());
+                bookInfo.put("total_page", book.getTotal_page());
+                bookInfoList.add(bookInfo);
+            }
         }
 
         return bookInfoList;
