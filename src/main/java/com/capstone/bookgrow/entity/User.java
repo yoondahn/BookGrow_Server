@@ -22,8 +22,6 @@ public class User {
     private int cumulativeMinutes;
     private int cumulativeSeconds;
 
-    private String pages_per_day;
-    private String time_per_page;
     private int owned;
     private int complete;
     private int flower;

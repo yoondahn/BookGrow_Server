@@ -25,8 +25,9 @@ public class Book {
     private String publisher;
     private String published_year;
     private String isbn;
-    private String total_page;
-    private String current_page;
+
+    private int total_page;
+    private int current_page;
     private String image_url;
     private Boolean is_completed;
 }

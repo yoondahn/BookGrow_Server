@@ -34,6 +34,9 @@ public class RecommendService {
     @Value("${ml.server.url}")
     private String ML_SERVER_URL;
 
+    @Value("${crawling.url}")
+    private String CRAWLING_URL;
+
     private final RecommendRepository recommendRepository;
 
     // 이미지 파일을 ML 서버로 전송하여 감정 인식 결과 받기
@@ -99,7 +102,7 @@ public class RecommendService {
     public List<Map<String, String>> sendRequestToMLServer() {
         try {
             RestTemplate restTemplate = new RestTemplate();
-            String fullUrl = ML_SERVER_URL + "/get_bestsellers";
+            String fullUrl = CRAWLING_URL + "/get_bestsellers";
 
             log.info("ML 서버에 베스트셀러 정보 요청 중: {}", fullUrl);
 
