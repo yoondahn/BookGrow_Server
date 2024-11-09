@@ -28,7 +28,7 @@ public class Reading {
 
     private int start_page;
     private int end_page;
-    private String time;
+    private String read_time;
 
     @ElementCollection
     @CollectionTable(name = "reading_review", joinColumns = @JoinColumn(name = "reading_id"))

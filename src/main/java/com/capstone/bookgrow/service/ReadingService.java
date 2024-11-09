@@ -48,7 +48,7 @@ public class ReadingService {
 
                 currentReviewList.addAll(newReviewList);
                 existingReading.setReview(currentReviewList);
-                existingReading.setTime(reading.getTime());
+                existingReading.setRead_time(reading.getRead_time());
 
                 // 기존 end_page 값을 start_page로 설정
                 existingReading.setStart_page(existingReading.getEnd_page());
@@ -70,7 +70,7 @@ public class ReadingService {
 
             Reading savedReading = readingRepository.save(reading);
 
-            updateCumulativeTime(user, reading.getTime());
+            updateCumulativeTime(user, reading.getRead_time());
 
             if (Boolean.TRUE.equals(reading.getIsCompleted())) { // 완료 여부가 true이면 업데이트
                 user.setComplete(user.getComplete() + 1);
@@ -119,40 +119,39 @@ public class ReadingService {
     }
 
     // 누적 시간 업데이트 메서드
-    private void updateCumulativeTime(User user, String time) {
-        // time이 null인 경우 기본값 "00:00:00" 설정
-        if (time == null) {
-            time = "00:00:00";
-
-            // time 파싱
-            String[] timeParts = time.split(":");
-            int hours = Integer.parseInt(timeParts[0]);
-            int minutes = Integer.parseInt(timeParts[1]);
-            int seconds = Integer.parseInt(timeParts[2]);
-
-            // 현재 누적 시간 가져오기
-            int currentHours = user.getCumulativeHours();
-            int currentMinutes = user.getCumulativeMinutes();
-            int currentSeconds = user.getCumulativeSeconds();
-
-            // 새로운 누적 시간 계산
-            int newSeconds = currentSeconds + seconds;
-            int extraMinutes = newSeconds / 60;
-            newSeconds = newSeconds % 60;
-
-            int newMinutes = currentMinutes + minutes + extraMinutes;
-            int extraHours = newMinutes / 60;
-            newMinutes = newMinutes % 60;
-
-            int newHours = currentHours + hours + extraHours;
-
-            // 누적 시간 업데이트
-            user.setCumulativeHours(newHours);
-            user.setCumulativeMinutes(newMinutes);
-            user.setCumulativeSeconds(newSeconds);
-
-            // 사용자 업데이트
-            userRepository.save(user);
+    private void updateCumulativeTime(User user, String read_time) {
+        if (read_time == null) {
+            read_time = "00:00:00";
         }
+
+        // time 파싱
+        String[] timeParts = read_time.split(":");
+        int hours = Integer.parseInt(timeParts[0]);
+        int minutes = Integer.parseInt(timeParts[1]);
+        int seconds = Integer.parseInt(timeParts[2]);
+
+        // 현재 누적 시간 가져오기
+        int currentHours = user.getCumulativeHours();
+        int currentMinutes = user.getCumulativeMinutes();
+        int currentSeconds = user.getCumulativeSeconds();
+
+        // 새로운 누적 시간 계산
+        int newSeconds = currentSeconds + seconds;
+        int extraMinutes = newSeconds / 60;
+        newSeconds = newSeconds % 60;
+
+        int newMinutes = currentMinutes + minutes + extraMinutes;
+        int extraHours = newMinutes / 60;
+        newMinutes = newMinutes % 60;
+
+        int newHours = currentHours + hours + extraHours;
+
+        // 누적 시간 업데이트
+        user.setCumulativeHours(newHours);
+        user.setCumulativeMinutes(newMinutes);
+        user.setCumulativeSeconds(newSeconds);
+
+        // 사용자 업데이트
+        userRepository.save(user);
     }
 }
